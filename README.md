@@ -1,2 +1,2 @@
 # node-csv-events
-Event based CSV parser
+This software package is at early alpha development stage
