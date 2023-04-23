@@ -11,9 +11,9 @@ test ('two lines no quotes', () => {
 	})
 
 	c.write ('1;21,')
-	c.write ('22,23;3\r\n')
+	c.write ('22,23;3\n')
 
-	c.end ('4;5;6\r\n')
+	c.end ('4;5;6\n')
 
 	expect (all).toStrictEqual (['21,22,23'])
 
