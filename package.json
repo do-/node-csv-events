@@ -1,6 +1,6 @@
 {
   "name": "csv-events",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "An event based CSV parser",
   "main": "index.js",
   "files": ["/lib", "/badges"],
