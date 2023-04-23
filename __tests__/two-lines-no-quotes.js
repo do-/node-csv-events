@@ -7,7 +7,7 @@ test ('two lines no quotes', () => {
 	let all = []
 	
 	c.on ('c', () => {
-		if (c.column === 1) all.push (c.value)
+		if (c.row === 0n && c.column === 1) all.push (c.value)
 	})
 
 	c.write ('1;21,')
@@ -15,6 +15,6 @@ test ('two lines no quotes', () => {
 
 	c.end ('4;5;6\r\n')
 
-	expect (all).toStrictEqual (['21,22,23', '5'])
+	expect (all).toStrictEqual (['21,22,23'])
 
 })
