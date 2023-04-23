@@ -6,8 +6,8 @@ test ('two lines no quotes', () => {
 	
 	let all = [], cur = [] 
 	
-	c.on ('r', s => {all.push (cur); cur = []})
-	c.on ('c', s => cur.push (s))
+	c.on ('r', () => {all.push (cur); cur = []})
+	c.on ('c', () => cur.push (c.value))
 	
 	c.write ('1;21,')
 	c.write ('22,23;3\r\n')
