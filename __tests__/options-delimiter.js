@@ -10,9 +10,9 @@ test ('bad delimiter length', () => {
 })
 
 test ('default delimiter', () => {
-	expect (new CSVEventEmitter ().delimiterCode).toBe (44)
+	expect (new CSVEventEmitter ().CH_COMMA).toBe (44)
 })
 
 test ('default delimiter', () => {
-	expect (new CSVEventEmitter ({delimiter: ';'}).delimiterCode).toBe (59)
+	expect (new CSVEventEmitter ({delimiter: ';'}).CH_COMMA).toBe (59)
 })
