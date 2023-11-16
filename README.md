@@ -45,13 +45,14 @@ npm install csv-events
 |Name|Description|
 |-|-|
 |`write (s)`| Append `s` to the internal buffer `buf` and emit all events for its parseable part; leave last unterminated cell source in `buf`|
-|`end (s)`| Execute `write (s)` and emit last events for the rest of `buf`|
+|`end (s)`| Execute `write (s)` and emit last events for the rest of `buf` and, finally, emits `'end'`|
 
 # Events
 |Name|Description|
 |-|-|
 |`c`| Emitted for each cell when its content is available (via the `value` property, see below)|
 |`r`| Emitted for each row completed|
+|`end`| Emitted by `end (s)`|
 
 # Properties
 |Name|Type|Description|
