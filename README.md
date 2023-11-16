@@ -62,7 +62,8 @@ npm install csv-events
 |`buf`|String|The internal buffer containing unparsed portion of the text gathered from `write` arguments|
 |`from`|Number|Starting position of the current cell in `buf`|
 |`to`|Number|Ending position of the current cell in `buf`|
-|`value`|String|Unquoted value of `buf.slice (from, to)`, replaced with `empty` for a zero length string (computed property)|
+|`raw`|String|Verbatim copy of `buf` between `from` and `to`, except row delimiters (computed property)|
+|`value`|String|Unquoted `raw`, replaced with `empty` for a zero length string (computed property)|
 
 # Limitations
 ## Line Breaks
