@@ -3,8 +3,8 @@
 
 [`csv-events`](https://github.com/do-/node-csv-events) is a node.js library for reading [CSV](https://datatracker.ietf.org/doc/html/rfc4180) files featuring two classes:
 
-* [CSVEventEmitter](CSVEventEmitter): a low level event emitter;
-* [CSVReader](CSVReader): an application level object stream transformer.
+* `CSVEventEmitter`: a low level event emitter;
+* `CSVReader`: an application level object stream transformer.
 
 # Installation
 ```
