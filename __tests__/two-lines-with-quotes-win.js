@@ -6,7 +6,7 @@ test ('two lines no quotes', async () =>  {
 
 	await new Promise ((ok, fail) => {
 
-		const c = new CSVEventEmitter ({empty: null})
+		const c = new CSVEventEmitter ({empty: null, mask: 0xF})
 	
 		let cur = [], cr = []
 

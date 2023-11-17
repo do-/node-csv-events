@@ -2,7 +2,7 @@ const {CSVEventEmitter} = require ('..')
 
 test ('one line with quotes', () => {
 
-	const c = new CSVEventEmitter ({})
+	const c = new CSVEventEmitter ({mask: 0xF})
 	
 	const a = []; c.on ('c', () => a.push (c.value))
 	
