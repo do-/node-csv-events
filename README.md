@@ -22,6 +22,7 @@ const {CSVReader} = require ('csv-events')
 
 const csv = CSVReader ({
 //  delimiter: ',',
+//  skip: 0,           // header lines
 //  empty: null,
     columns: [
       'id',            // 1st column: read as `id`, unquote
@@ -45,6 +46,7 @@ for await (const {id, name} of csv) {
 |-|-|-|
 |`columns`| |Array of column definitions (see below)|
 |`delimiter`|`','`|Column delimiter|
+|`skip`|`0`|Number of header lines to ignore|
 |`empty`|`null`|The `value` corresponding to zero length cell content|
 |`maxLength`|1e6|The maximum cell length allowed (to prevent a memory overflow)|
 ### More on `columns`
