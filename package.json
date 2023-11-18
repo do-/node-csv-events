@@ -1,6 +1,6 @@
 {
   "name": "csv-events",
-  "version": "0.0.20",
+  "version": "0.0.21",
   "description": "An event based CSV parser",
   "main": "index.js",
   "files": ["/lib", "/badges"],
@@ -15,9 +15,7 @@
 	"coverageReporters": ["clover", "json", "lcov", "text", "json-summary"],
   	"verbose": false,
   	"testPathIgnorePatterns": [
-  		"/node_modules/",
-  		"/__tests__/data",
-  		"/__tests__/lib"
+  		"/node_modules/"
   	]
   },
   "repository": {
