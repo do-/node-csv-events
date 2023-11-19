@@ -37,6 +37,7 @@ test ('skip header', async () =>  {
 
 	const reader = new CSVReader ({
 		skip: 1,
+		rowNumField: '#',
 		columns: [
 			'id',
 			null, 
@@ -61,8 +62,8 @@ test ('skip header', async () =>  {
 	})
 
 	expect (a).toStrictEqual ([
-		{id: '1', label: 'One'}, 
-		{id: '2', label: '"Two"'},
+		{'#': 1, id: '1', label: 'One'}, 
+		{'#': 2, id: '2', label: '"Two"'},
 	])
 
 })
