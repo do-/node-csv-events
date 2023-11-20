@@ -21,12 +21,14 @@ test ('basic', async () =>  {
 		reader.on ('end', ok)
 		reader.on ('data', r => a.push (r))
 
+		reader.write (Buffer.from (',true,\n', 'utf-8'))
 		reader.write (Buffer.from ('"1",true,One\n', 'utf-8'))
 		reader.end   (Buffer.from ('2,false,"Two"\n', 'utf-8'))
 
 	})
 
 	expect (a).toStrictEqual ([
+		{id: null, label: ''}, 
 		{id: '1', label: 'One'}, 
 		{id: '2', label: '"Two"'},
 	])
