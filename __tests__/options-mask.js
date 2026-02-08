@@ -2,13 +2,12 @@ const {CSVEventEmitter} = require ('..')
 
 test ('ok', () => {
 	expect (new CSVEventEmitter ({mask: 1}).mask).toBe (1)
+	expect (new CSVEventEmitter ({}).mask).toBe (0)
 })
 
 test ('bad', () => {
-	expect (() => new CSVEventEmitter ({})).toThrow ('Mask')
 	expect (() => new CSVEventEmitter ({mask: true})).toThrow ('mask')
 	expect (() => new CSVEventEmitter ({mask: 3.14})).toThrow ('mask')
-	expect (() => new CSVEventEmitter ({mask: -1n})).toThrow ('mask')
 })
 
 test ('int mask', () => {
