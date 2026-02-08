@@ -2,7 +2,7 @@ const {CSVEventEmitter} = require ('..')
 
 test ('two lines no quotes', () => {
 
-	const c = new CSVEventEmitter ({delimiter: ';', mask: 0xF})
+	const c = new CSVEventEmitter ({delimiter: ';'})
 	
 	let all = []
 	
