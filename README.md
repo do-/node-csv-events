@@ -100,28 +100,33 @@ No event carries any payload, though the parsed content details such as
 
 are available via the `CSVEventEmitter` instance properties. This approach lets the application read selected portions of incoming text avoiding some overhead related to data not in use.
 
-## Constructor Options
+# Installation
+```
+npm install csv-events
+```
+
+# Constructor Options
 |Name|Default value|Description|
 |-|-|-|
-|`mask`| |Bit mask of required fields|
+|`mask`|`0`|Bit mask of required fields, `0` means 'all'|
 |`delimiter`|`','`|Column delimiter|
 |`empty`|`null`|The `value` corresponding to zero length cell content|
 |`maxLength`|1e6|The maximum `buf.length` allowed (inherently, the maximum length of `write` and `end` arguments)|
 
-## Methods
+# Methods
 |Name|Description|
 |-|-|
 |`write (s)`| Append `s` to the internal buffer `buf` and emit all events for its parseable part; leave last unterminated cell source in `buf`|
 |`end (s)`| Execute `write (s)` and emit last events for the rest of `buf` and, finally, emits `'end'`|
 
-## Events
+# Events
 |Name|Payload|Description|
-|-|-|
+|-|-|-|
 |`c`|`column`| Emitted for each cell which number satisfies `mask` when its content is available (via `value` and `raw` properties, see below)|
 |`r`| | Emitted for each row completed|
 |`end`| | Emitted by `end (s)`|
 
-## Properties
+# Properties
 |Name|Type|Description|
 |-|-|-|
 |`unit`|Number or Bigint|`1` corresponding to `mask` by type|
@@ -136,14 +141,16 @@ are available via the `CSVEventEmitter` instance properties. This approach lets 
 
 # Limitations
 ## Line Breaks
-`CSVEventEmitter` and `CSVReader` recognize both:
+`CSVEventEmitter` always recognizes both:
 * `CRLF` (`'\r\n'`, RFC 4180, Windows style) and
 * `LF`  (`'\n'`, UNIX style)
-as line breaks without any explicit option setting.
+as line breaks without explicit option setting.
 
-There is no way to apply `CSVEventEmitter` / `CSVReader` directly to texts generated with MacOS pre-X, Commodore, Amiga etc. neither any plans to implement such compatibility features.
+There is no way to apply `CSVEventEmitter` directly to texts generated with MacOS pre-X, Commodore, Amiga etc. neither any plans to implement such compatibility features.
 
 ## CSV Validity
-`csv-events` don't make any attempt to restore data from broken CSV source. So, a single unbalanced double quote will make all the rest of file lost.
+`CSVEventEmitter` doesn't make any attempt to restore data from broken CSV source. So, a single unbalanced double quote will make all the rest of file lost.
+
+The best `CSVEventEmitter` can do in such case is not to waste too much memory keeping its internal buffer not bigger than `maxLength` characters.
 
 The best `csv-events` can do in such case is not to waste too much memory keeping its internal buffer not bigger than `maxLength` characters.
