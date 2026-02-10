@@ -5,7 +5,7 @@ test ('edge cases', () => {
 	const c = new CSVEventEmitter ({mask: 0xF})
 
 	c.write ('')
-	c.end ()
+	c.end ('')
 
 })
 
