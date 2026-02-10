@@ -7,7 +7,8 @@ test ('two lines no quotes', async () =>  {
 	await new Promise ((ok, fail) => {
 
 		const c = new CSVEventEmitter ({empty: null, mask: 0xF})
-	
+		const e = [], cb = _ => {if (_) e.push (_)}	
+
 		let cur = [], cr = []
 
 		c.once ('end', ok)
@@ -24,10 +25,12 @@ test ('two lines no quotes', async () =>  {
 
 		try {
 
-			c.write ('"",2')
-			c.write ('2,"""..."\n')
+			c.write ('"",2', cb)
+			c.write ('2,"""..."\n', cb)
 		
-			c.end ('4,"5\r,5\n""5"",5\r\n""",6\n')	
+			c.end ('4,"5\r,5\n""5"",5\r\n""",6\n', cb)	
+
+			if (e [0]) throw e [0]
 	
 		}
 		catch (err) {
