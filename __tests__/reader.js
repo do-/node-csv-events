@@ -28,9 +28,9 @@ test ('basic', async () =>  {
 	})
 
 	expect (a).toStrictEqual ([
-		{id: null, label: ''}, 
-		{id: '1', label: 'One'}, 
-		{id: '2', label: '"Two"'},
+		{id: null, label: '', [CSVReader.ROW_NUM]: 1}, 
+		{id: '1', label: 'One', [CSVReader.ROW_NUM]: 2}, 
+		{id: '2', label: '"Two"', [CSVReader.ROW_NUM]: 3},
 	])
 
 })
