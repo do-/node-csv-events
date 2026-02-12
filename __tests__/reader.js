@@ -7,7 +7,7 @@ test ('basic', async () =>  {
 		columns: [
 			'id',
 			null, 
-			{name: 'label', raw: true},
+			{name: 'label'},
 		]
 	})
 
@@ -28,9 +28,9 @@ test ('basic', async () =>  {
 	})
 
 	expect (a).toStrictEqual ([
-		{id: null, label: '', [CSVReader.ROW_NUM]: 1}, 
+		{id: null, label: null, [CSVReader.ROW_NUM]: 1}, 
 		{id: '1', label: 'One', [CSVReader.ROW_NUM]: 2}, 
-		{id: '2', label: '"Two"', [CSVReader.ROW_NUM]: 3},
+		{id: '2', label: 'Two', [CSVReader.ROW_NUM]: 3},
 	])
 
 })
@@ -43,7 +43,7 @@ test ('skip header', async () =>  {
 		columns: [
 			'id',
 			null, 
-			{name: 'label', raw: true},
+			{name: 'label'},
 		]
 	})
 
@@ -65,7 +65,7 @@ test ('skip header', async () =>  {
 
 	expect (a).toStrictEqual ([
 		{'#': 1, id: '1', label: 'One'}, 
-		{'#': 2, id: '2', label: '"Two"'},
+		{'#': 2, id: '2', label: 'Two'},
 	])
 
 })
