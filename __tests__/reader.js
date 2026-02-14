@@ -35,6 +35,44 @@ test ('basic', async () =>  {
 
 })
 
+test ('array', async () =>  {
+
+	const reader = new CSVReader ({
+		empty: null,
+		recordClass: Array,
+		columns: [
+			'id',
+			null, 
+			{name: 'label'},
+		]
+	})
+
+	expect (reader).toBeInstanceOf (CSVReader)
+
+	const a = []
+
+	await new Promise ((ok, fail) => {
+
+		reader.on ('error', fail)
+		reader.on ('end', ok)
+		reader.on ('data', r => a.push (r))
+
+		reader.write (Buffer.from (',true,\n', 'utf-8'))
+		reader.write (Buffer.from ('"1",true,One\n', 'utf-8'))
+		reader.end   (Buffer.from ('2,false,"Two"\n', 'utf-8'))
+
+	})
+
+	expect (a.map (_ => [..._])).toStrictEqual ([
+		[null, null], 
+		['1', 'One'], 
+		['2', 'Two'], 
+	])
+
+	expect (a.map (_ => _[CSVReader.ROW_NUM])).toStrictEqual ([1, 2, 3])
+
+})
+
 test ('skip header', async () =>  {
 
 	const reader = new CSVReader ({
