@@ -73,7 +73,7 @@ test ('array', async () =>  {
 
 })
 
-test ('skip header', async () =>  {
+test ('skip', async () =>  {
 
 	const reader = new CSVReader ({
 		skip: 2,
@@ -109,6 +109,40 @@ test ('skip header', async () =>  {
 
 })
 
+test ('header', async () =>  {
+
+	const reader = new CSVReader ({
+		skip: 1,
+		header: 2,
+		mask: 5,
+		rowNumField: '#',
+	})
+
+	expect (reader).toBeInstanceOf (CSVReader)
+
+	const a = []
+
+	await new Promise ((ok, fail) => {
+
+		reader.on ('error', fail)
+		reader.on ('end', ok)
+		reader.on ('data', r => a.push (r))
+
+		reader.write (Buffer.from ('-----------------\n', 'utf-8'))
+		reader.write (Buffer.from ('id,is_active,label\n', 'utf-8'))
+		reader.write (Buffer.from ('int,bool,text\n', 'utf-8'))
+		reader.write (Buffer.from ('"1",true,One\n', 'utf-8'))
+		reader.end   (Buffer.from ('2,false,"Two"\n', 'utf-8'))
+
+	})
+
+	expect (a).toStrictEqual ([
+		{'#': 1, id: '1', label: 'One'}, 
+		{'#': 2, id: '2', label: 'Two'},
+	])
+
+})
+
 
 test ('bigint', () => {
 
@@ -125,6 +159,8 @@ test ('bad options', () => {
 	expect (() => new CSVReader ({columns: {}})).toThrow ()
 	expect (() => new CSVReader ({columns: [], skip: null})).toThrow ()
 	expect (() => new CSVReader ({columns: [], skip: -1})).toThrow ()
+	expect (() => new CSVReader ({columns: [], header: -1})).toThrow ()
+	expect (() => new CSVReader ({columns: [], header: 'A'})).toThrow ()
 
 })
 
