@@ -4,6 +4,7 @@ test ('basic', async () =>  {
 
 	const reader = new CSVReader ({
 		empty: null,
+		rowNumField: '#',
 		columns: [
 			'id',
 			null, 
@@ -28,9 +29,9 @@ test ('basic', async () =>  {
 	})
 
 	expect (a).toStrictEqual ([
-		{id: null, label: null, [CSVReader.ROW_NUM]: 1}, 
-		{id: '1', label: 'One', [CSVReader.ROW_NUM]: 2}, 
-		{id: '2', label: 'Two', [CSVReader.ROW_NUM]: 3},
+		{id: null, label: null, '#': 1}, 
+		{id: '1', label: 'One', '#': 2}, 
+		{id: '2', label: 'Two', '#': 3},
 	])
 
 })
@@ -63,7 +64,7 @@ test ('array', async () =>  {
 
 	})
 
-	expect (a.map (_ => [..._])).toStrictEqual ([
+	expect (a).toStrictEqual ([
 		[null, null], 
 		['1', 'One'], 
 		['2', 'Two'], 
