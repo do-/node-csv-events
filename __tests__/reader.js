@@ -7,7 +7,7 @@ test ('basic', async () =>  {
 		columns: [
 			'id',
 			null, 
-			{name: 'label'},
+			['label'],
 		]
 	})
 
@@ -43,7 +43,7 @@ test ('array', async () =>  {
 		columns: [
 			'id',
 			null, 
-			{name: 'label'},
+			['label'],
 		]
 	})
 
@@ -81,7 +81,7 @@ test ('skip header', async () =>  {
 		columns: [
 			'id',
 			null, 
-			{name: 'label'},
+			['label'],
 		]
 	})
 
@@ -135,7 +135,7 @@ test ('bad write', async () =>  {
 		columns: [
 			'id',
 			null, 
-			{name: 'label', raw: true},
+			['label'],
 		]
 	})
 
@@ -160,7 +160,7 @@ test ('bad end', async () =>  {
 		columns: [
 			'id',
 			null, 
-			{name: 'label', raw: true},
+			['label'],
 		]
 	})
 
