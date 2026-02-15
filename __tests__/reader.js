@@ -40,6 +40,7 @@ test ('array', async () =>  {
 
 	const reader = new CSVReader ({
 		empty: null,
+		rowNumField: 'NO',
 		recordClass: Array,
 		columns: [
 			'id',
@@ -64,13 +65,13 @@ test ('array', async () =>  {
 
 	})
 
-	expect (a).toStrictEqual ([
+	expect (a.map (_ => [..._])).toStrictEqual ([
 		[null, null], 
 		['1', 'One'], 
 		['2', 'Two'], 
 	])
 
-	expect (a.map (_ => _[CSVReader.ROW_NUM])).toStrictEqual ([1, 2, 3])
+	expect (a.map (_ => _.NO)).toStrictEqual ([1, 2, 3])
 
 })
 
