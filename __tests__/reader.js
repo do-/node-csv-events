@@ -266,32 +266,32 @@ test ('header overflow', async () =>  {
 
 })
 
-// test.only ('empty', async () =>  {
+test ('empty', async () =>  {
 
-// 	const reader = new CSVReader ({
-// 		empty: null,
-// 		rowNumField: '#',
-// 		columns: [
-// 			'id',
-// 			null, 
-// 			['label'],
-// 		]
-// 	})
+	const reader = new CSVReader ({
+		empty: null,
+		rowNumField: '#',
+		columns: [
+			'id',
+			null, 
+			['label'],
+		]
+	})
 
-// 	expect (reader).toBeInstanceOf (CSVReader)
+	expect (reader).toBeInstanceOf (CSVReader)
 
-// 	const a = []
+	const a = []
 
-// 	await new Promise ((ok, fail) => {
+	await new Promise ((ok, fail) => {
 
-// 		reader.on ('error', fail)
-// 		reader.on ('end', ok)
-// 		reader.on ('data', r => a.push (r))
+		reader.on ('error', fail)
+		reader.on ('end', ok)
+		reader.on ('data', r => a.push (r))
 
-// 		reader.end   (Buffer.from ('\n', 'utf-8'))
+		reader.end   (Buffer.from ('\n', 'utf-8'))
 
-// 	})
+	})
 
-// 	expect (a).toStrictEqual ([])
+	expect (a).toStrictEqual ([])
 
-// })
+})
