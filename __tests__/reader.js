@@ -1,4 +1,4 @@
-const {CSVReader} = require ('..')
+const {CSVReader, CSVColumn} = require ('..')
 
 test ('basic', async () =>  {
 
@@ -113,9 +113,30 @@ test ('skip', async () =>  {
 
 test ('header', async () =>  {
 
+	class Col extends CSVColumn {
+
+		constructor (reader, options) {
+
+			super (reader, options)
+
+			this.type = options [1]
+
+		}
+
+		get value () {
+
+			const v = super.value
+
+			return this.type === 'int' ? parseInt (v) : v
+
+		}
+
+	}
+
 	const reader = new CSVReader ({
 		skip: 1,
 		header: 2,
+		columnClass: Col,
 		mask: 5,
 		rowNumField: '#',
 	})
@@ -139,8 +160,8 @@ test ('header', async () =>  {
 	})
 
 	expect (a).toStrictEqual ([
-		{'#': 1, id: '1', label: 'One'}, 
-		{'#': 2, id: '2', label: 'Two'},
+		{'#': 1, id: 1, label: 'One'}, 
+		{'#': 2, id: 2, label: 'Two'},
 	])
 
 })
@@ -163,6 +184,8 @@ test ('bad options', () => {
 	expect (() => new CSVReader ({columns: [], skip: -1})).toThrow ()
 	expect (() => new CSVReader ({columns: [], header: -1})).toThrow ()
 	expect (() => new CSVReader ({columns: [], header: 'A'})).toThrow ()
+	expect (() => new CSVReader ({columns: [], header: 1, maxColumns: -100})).toThrow ()
+	expect (() => new CSVReader ({columns: [], header: 1, maxColumns: 'A'})).toThrow ()
 
 })
 
@@ -212,6 +235,32 @@ test ('bad end', async () =>  {
 
 		reader.write (Buffer.from ([0xEF, 0xBB]))
 		reader.end (Buffer.from ([0xBF]))
+
+	})).rejects.toThrow ()
+
+})
+
+test ('header overflow', async () =>  {
+
+	const reader = new CSVReader ({
+		skip: 1,
+		header: 2,
+		mask: 5,
+		rowNumField: '#',
+		maxColumns: 2,
+	})
+
+	await expect (new Promise ((ok, fail) => {
+
+		reader.on ('error', fail)
+		reader.on ('end', ok)
+		reader.on ('data', r => a.push (r))
+
+		reader.write (Buffer.from ('-----------------\n', 'utf-8'))
+		reader.write (Buffer.from ('id,is_active,label\n', 'utf-8'))
+		reader.write (Buffer.from ('int,bool,text\n', 'utf-8'))
+		reader.write (Buffer.from ('"1",true,One\n', 'utf-8'))
+		reader.end   (Buffer.from ('2,false,"Two"\n', 'utf-8'))
 
 	})).rejects.toThrow ()
 
