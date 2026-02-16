@@ -237,7 +237,7 @@ test ('empty', async () =>  {
 		reader.on ('end', ok)
 		reader.on ('data', r => a.push (r))
 
-		reader.end   (Buffer.from ('\n', 'utf-8'))
+		reader.end   (Buffer.from ('\r\n', 'utf-8'))
 
 	})
 
