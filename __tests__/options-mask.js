@@ -21,8 +21,8 @@ test ('int mask', () => {
 		all.push (r); r = {}
 	})
 	
-	c.on ('c', k => {
-		r [k] = (c.value)
+	c.on ('c', () => {
+		r [c.column] = (c.value)
 	})
 
 	c.write ('1;true;admin\n', cb)
