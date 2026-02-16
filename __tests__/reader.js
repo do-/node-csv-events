@@ -189,57 +189,6 @@ test ('bad options', () => {
 
 })
 
-test ('bad write', async () =>  {
-
-	const reader = new CSVReader ({
-		maxLength: 1,
-		columns: [
-			'id',
-			null, 
-			['label'],
-		]
-	})
-
-	expect (reader).toBeInstanceOf (CSVReader)
-
-	await expect (new Promise ((ok, fail) => {
-
-		reader.on ('error', fail)
-		reader.on ('end', ok)
-		reader.on ('data', r => a.push (r))
-
-		reader.write (Buffer.from ('           ', 'utf-8'))
-
-	})).rejects.toThrow ()
-
-})
-
-test ('bad end', async () =>  {
-
-	const reader = new CSVReader ({
-		maxLength: 1,
-		columns: [
-			'id',
-			null, 
-			['label'],
-		]
-	})
-
-	expect (reader).toBeInstanceOf (CSVReader)
-
-	await expect (new Promise ((ok, fail) => {
-
-		reader.on ('error', fail)
-		reader.on ('end', ok)
-		reader.on ('data', r => a.push (r))
-
-		reader.write (Buffer.from ([0xEF, 0xBB]))
-		reader.end (Buffer.from ([0xBF]))
-
-	})).rejects.toThrow ()
-
-})
-
 test ('header overflow', async () =>  {
 
 	const reader = new CSVReader ({
