@@ -13,28 +13,23 @@ test ('edge cases', () => {
 
 })
 
-test ('one line no quotes', () => {
+test ('one line no quotes', async () => {
 
 	const RESULT = ['1', '', 'supervisor']
-	const e = [], cb = _ => {if (_) e.push (_)}
 
-	const p = s => {
+	const p = s => new Promise (ok => {
 
 		const c = new CSVEventEmitter ({mask: 0xF})
 	
 		const a = []; c.on ('c', () => a.push (c.value))
 
-		c.end (s, cb)
+		c.write (s, e => e ? fail (e) : '')
+		c.end ('', () => ok (a))
 
-		return a
+	})
 	
-	}
-
-	expect (e).toHaveLength (0)
-	
-	expect (p ('1,,supervisor')).toStrictEqual (RESULT)
-	expect (p ('1,,supervisor\n')).toStrictEqual (RESULT)
-	expect (p ('1,,supervisor\r\n')).toStrictEqual (RESULT)
+	expect (await p ('1,,supervisor')).toStrictEqual (RESULT)
+	expect (await p ('1,,supervisor\n')).toStrictEqual (RESULT)
+	expect (await p ('1,,supervisor\r\n')).toStrictEqual (RESULT)
 
 })
-

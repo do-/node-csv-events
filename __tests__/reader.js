@@ -209,7 +209,7 @@ test ('header overflow', async () =>  {
 		reader.write (Buffer.from ('id,is_active,label\n', 'utf-8'))
 		reader.write (Buffer.from ('int,bool,text\n', 'utf-8'))
 		reader.write (Buffer.from ('"1",true,One\n', 'utf-8'))
-		reader.end   (Buffer.from ('2,false,"Two"\n', 'utf-8'))
+		reader.end   (Buffer.from ('2,false,"Two"', 'utf-8'))
 
 	})).rejects.toThrow ()
 
