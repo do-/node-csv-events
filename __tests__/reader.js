@@ -189,6 +189,53 @@ test ('bad options', () => {
 
 })
 
+test ('overflow 1', async () =>  {
+
+	const reader = new CSVReader ({
+		header: 1,
+		maxLength: 5,
+	})
+
+	await expect (new Promise ((ok, fail) => {
+
+		reader.on ('error', fail)
+		reader.on ('end', ok)
+		reader.on ('data', r => a.push (r))
+
+		reader.write (Buffer.from ('id,is_active,label\n', 'utf-8'))
+		reader.write (Buffer.from ('"1",true,One\n', 'utf-8'))
+		reader.end   (Buffer.from ('2,false,"Two"', 'utf-8'))
+
+	})).rejects.toThrow ()
+
+})
+
+test ('overflow 2', async () =>  {
+
+	const reader = new CSVReader ({
+		maxLength: 1,
+		columns: [
+			'id',
+			null, 
+			['label'],
+		]
+	})
+
+	expect (reader).toBeInstanceOf (CSVReader)
+
+	await expect (new Promise ((ok, fail) => {
+
+		reader.on ('error', fail)
+		reader.on ('end', ok)
+		reader.on ('data', r => a.push (r))
+
+		reader.write (Buffer.from ([0xEF, 0xBB]))
+		reader.end (Buffer.from ([0xBF]))
+
+	})).rejects.toThrow ()
+
+})
+
 test ('header overflow', async () =>  {
 
 	const reader = new CSVReader ({

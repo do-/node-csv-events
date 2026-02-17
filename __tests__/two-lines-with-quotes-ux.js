@@ -1,43 +1,27 @@
 const {CSVEventEmitter} = require ('..')
 
-test ('two lines no quotes', async () =>  {
+test ('two lines no quotes', () =>  {
 
 	const all = [], raw = []
 
-	await new Promise ((ok, fail) => {
+	const c = new CSVEventEmitter ({empty: null, mask: 0xF})
 
-		const c = new CSVEventEmitter ({empty: null, mask: 0xF})
-		const e = [], cb = _ => {if (_) e.push (_)}	
-
-		let cur = [], cr = []
+	let cur = [], cr = []
 	
-		c.on ('r', () => {
-			all.push (cur); cur = []
-			raw.push (cr);  cr  = []
-		})
+	c.on ('r', () => {
+		all.push (cur); cur = []
+		raw.push (cr);  cr  = []
+	})
 
-		c.on ('c', s => {
-			cur.push (c.value)
-			cr.push (c.raw)
-		})
-
-		try {
-
-			c.write ('"",2', cb)
-			c.write ('2,"""..."\n', cb)
+	c.on ('c', s => {
+		cur.push (c.value)
+		cr.push (c.raw)
+	})
+	
+	c.write ('"",2')
+	c.write ('2,"""..."\n')
 		
-			c.end ('4,"5\r,5\n""5"",5\r\n""",6\n', e => {cb, e ? fail (e) : ok ()})
-
-			if (e [0]) throw e [0]
-	
-		}
-		catch (err) {
-
-			fail (err)
-
-		}
-
-	}) 
+	c.end ('4,"5\r,5\n""5"",5\r\n""",6\n')
 
 	expect (all).toStrictEqual ([
 		[null, '22', '"...'],
