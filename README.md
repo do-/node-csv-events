@@ -96,7 +96,7 @@ These options are passed to the internal [CSVEventEmitter](https://github.com/do
 |`header`|`0`|Number of lines to gather `columns` definition|
 # `CSVEventEmitter` 
 
-This is a synchronous [CSV](https://datatracker.ietf.org/doc/html/rfc4180) parser implemented as an [event emitter](https://nodejs.org/dist/latest/docs/api/events.html).
+This is an [events](https://nodejs.org/dist/latest/docs/api/events.html) based synchronous [CSV](https://datatracker.ietf.org/doc/html/rfc4180) parser.
 
 ```js
 const {CSVEventEmitter} = require ('csv-events')
@@ -108,27 +108,28 @@ const ee = new CSVEventEmitter ({
 // maxLength: 1e6,
 })
 
-const names = []; ee.on ('c', () => {
+const names = []
+
+ee.on ('c', () => {
   if (ee.row !== 0n && ee.column === 1) names.push (ee.value)
+})
+
+ee.on ('r', () => {
+  console.log (`The row #${ee.row} consisted of ${ee.column} cell(s)`)
 })
 
 ee.write ('ID,NAME\r\n')
 ee.write ('1,admin\n')
-ee.end ('2,user\n') // `names` will be ['admin', 'user']
+ee.end   ('2,user\n') // `names` will be ['admin', 'user']
 ```
 
-Incoming data in form of [String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)s are supplied via the `write` and `end` synchronous methods (this API is loosely based on [StringDecoder](https://nodejs.org/dist/latest/docs/api/string_decoder.html)'s one) producing a sequence of `c` (_"cell"_) and `r` (_"row"_) events.
+Incoming data are supplied as [String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) arguments to `write ()` and `end ()` methods.
 
-No event carries any payload, though the parsed content details such as
-* row, column numbers;
-* unquoted cell content
+During each of that calls, a series of `'c'` (_"cell"_) and `'r'` (_[end of] "row"_) events is emitted.
 
-are available via the `CSVEventEmitter` instance properties. This approach lets the application read selected portions of incoming text avoiding some overhead related to data not in use.
+No event carries any payload. Subscribers have access to the current cell's `value` along with its `row` and `column` number via the emitter's properties.
 
-# Installation
-```
-npm install csv-events
-```
+So, each one chunk of a CSV source is processed synchronously. Parsing а huge text at once may lead to a considerable performance degradation. In applications, using [CSVReader](https://github.com/do-/node-csv-events/wiki/CSVReader) or a similar streaming wrapper is strongly encouraged.
 
 # Constructor Options
 |Name|Default value|Description|
@@ -136,20 +137,14 @@ npm install csv-events
 |`mask`|`0`|Bit mask of required fields, `0` means 'all'|
 |`delimiter`|`','`|Column delimiter|
 |`empty`|`null`|The `value` corresponding to zero length cell content|
+|`emptyDoc`|`\r\n`|If this equals the complete CSV text, no event is emitted at all|
 |`maxLength`|1e6|The maximum `buf.length` allowed (inherently, the maximum length of `write` and `end` arguments)|
-
-# Methods
-|Name|Description|
-|-|-|
-|`write (s)`| Append `s` to the internal buffer `buf` and emit all events for its parseable part; leave last unterminated cell source in `buf`|
-|`end (s)`| Execute `write (s)` and emit last events for the rest of `buf` and, finally, emits `'end'`|
 
 # Events
 |Name|Payload|Description|
 |-|-|-|
 |`c`|`column`| Emitted for each cell which number satisfies `mask` when its content is available (via `value` and `raw` properties, see below)|
 |`r`| | Emitted for each row completed|
-|`end`| | Emitted by `end (s)`|
 
 # Properties
 |Name|Type|Description|
@@ -162,20 +157,30 @@ npm install csv-events
 |`from`|Number|Starting position of the current cell in `buf`|
 |`to`|Number|Ending position of the current cell in `buf`|
 |`raw`|String|Verbatim copy of `buf` between `from` and `to`, except row delimiters (computed property)|
-|`value`|String|Unquoted `raw`, replaced with `empty` for a zero length string (computed property)|
+|`value`|String|Unquoted `raw`, replaced with `empty` for an unquoted zero length string (computed property)|
+
+# Methods
+## `end ([s])`
+A wrapper for `write (s)` (see below) called for the last text portion `s` or without arguments which means `s === ''`.
+
+Guarantees the last CSV line parsed to be `'\n'` terminated.
+
+## `write (s)`
+Appends `s` to the internal buffer and emits all events for its parseable part, unless `maxLength` is exceeded in wich case an error is thrown.
+
+The unparsed text is keept buffered.
 
 # Limitations
 ## Line Breaks
 `CSVEventEmitter` always recognizes both:
 * `CRLF` (`'\r\n'`, RFC 4180, Windows style) and
 * `LF`  (`'\n'`, UNIX style)
+
 as line breaks without explicit option setting.
 
 There is no way to apply `CSVEventEmitter` directly to texts generated with MacOS pre-X, Commodore, Amiga etc. neither any plans to implement such compatibility features.
 
 ## CSV Validity
-`CSVEventEmitter` doesn't make any attempt to restore data from broken CSV source. So, a single unbalanced double quote will make all the rest of file lost.
+`CSVEventEmitter` doesn't make any attempt to restore data from broken CSV source. So, a single unbalanced double quote will mess up the rest of file.
 
-The best `CSVEventEmitter` can do in such case is not to waste too much memory keeping its internal buffer not bigger than `maxLength` characters.
-
-The best `csv-events` can do in such case is not to waste too much memory keeping its internal buffer not bigger than `maxLength` characters.
+The best `CSVEventEmitter` can do in such case is not to waste too much memory by keeping its internal buffer limited with `maxLength`.
