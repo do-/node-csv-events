@@ -131,11 +131,6 @@ No event carries any payload. Subscribers have access to the current cell's `val
 
 So, each one chunk of a CSV source is processed synchronously. Parsing а huge text at once may lead to a considerable performance degradation. In applications, using [CSVReader](https://github.com/do-/node-csv-events/wiki/CSVReader) or a similar streaming wrapper is strongly encouraged.
 
-# Installation
-```
-npm install csv-events
-```
-
 # Constructor Options
 |Name|Default value|Description|
 |-|-|-|
