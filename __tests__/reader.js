@@ -1,4 +1,4 @@
-const {CSVReader, CSVColumn} = require ('..')
+const {CSVReader, CSVColumn, CSVRawColumn} = require ('..')
 
 test ('basic', async () =>  {
 
@@ -32,6 +32,44 @@ test ('basic', async () =>  {
 		{id: null, label: null, '#': 1}, 
 		{id: '1', label: 'One', '#': 2}, 
 		{id: '2', label: 'Two', '#': 3},
+	])
+
+})
+
+
+test ('raw', async () =>  {
+
+	const reader = new CSVReader ({
+		empty: null,
+		rowNumField: '#',		
+		columnClass: CSVRawColumn,
+		columns: [
+			'id',
+			null, 
+			['label'],
+		]
+	})
+
+	expect (reader).toBeInstanceOf (CSVReader)
+
+	const a = []
+
+	await new Promise ((ok, fail) => {
+
+		reader.on ('error', fail)
+		reader.on ('end', ok)
+		reader.on ('data', r => a.push (r))
+
+		reader.write (Buffer.from (',true,\n', 'utf-8'))
+		reader.write (Buffer.from ('"1",true,One\n', 'utf-8'))
+		reader.end   (Buffer.from ('2,false,"Two"\n', 'utf-8'))
+
+	})
+
+	expect (a).toStrictEqual ([
+		{id: '', label: '', '#': 1}, 
+		{id: '"1"', label: 'One', '#': 2}, 
+		{id: '2', label: '"Two"', '#': 3},
 	])
 
 })
