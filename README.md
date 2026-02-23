@@ -1,5 +1,6 @@
 ![workflow](https://github.com/do-/node-csv-events/actions/workflows/main.yml/badge.svg)
 ![Jest coverage](./badges/coverage-jest%20coverage.svg)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/do-/node-csv-events)
 
 [`csv-events`](https://github.com/do-/node-csv-events) is a node.js library for reading [CSV](https://datatracker.ietf.org/doc/html/rfc4180) files featuring two classes:
 
