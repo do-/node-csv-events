@@ -367,3 +367,44 @@ test ('destroy', async () =>  {
 	expect (e [0].message).toBe ('TEST')
 
 })
+
+test ('valueOf', async () =>  {
+
+	const reader = new CSVReader ({
+		empty: null,
+		rowNumField: '#',
+		recordClass: class {
+			valueOf () {
+				return {[this['#']]: [parseInt (this.id) || null, this.label]}
+			}
+		},
+		columns: [
+			'id',
+			null, 
+			['label'],
+		]
+	})
+
+	expect (reader).toBeInstanceOf (CSVReader)
+
+	const a = []
+
+	await new Promise ((ok, fail) => {
+
+		reader.on ('error', fail)
+		reader.on ('end', ok)
+		reader.on ('data', r => a.push (r))
+
+		reader.write (Buffer.from (',true,\n', 'utf-8'))
+		reader.write (Buffer.from ('"1",true,One\n', 'utf-8'))
+		reader.end   (Buffer.from ('2,false,"Two"\n', 'utf-8'))
+
+	})
+
+	expect (a).toStrictEqual ([
+		{'1': [null, null]},
+		{'2': [1, 'One']},
+		{'3': [2, 'Two']},
+	])
+
+})
