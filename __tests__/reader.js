@@ -408,3 +408,33 @@ test ('valueOf', async () =>  {
 	])
 
 })
+
+test ('zero', async () =>  {
+
+	const reader = new CSVReader ({
+		empty: null,
+		rowNumField: '#',
+		columns: [
+			'id',
+			null, 
+			['label'],
+		]
+	})
+
+	expect (reader).toBeInstanceOf (CSVReader)
+
+	const a = []
+
+	await new Promise ((ok, fail) => {
+
+		reader.on ('error', fail)
+		reader.on ('end', ok)
+		reader.on ('data', r => a.push (r))
+
+		reader.end   ()
+
+	})
+
+	expect (a).toStrictEqual ([])
+
+})
