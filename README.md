@@ -28,7 +28,10 @@ const csv = CSVReader ({
 
 //  recordClass: Array   // to get [id, name] instead of {id, name}
 
-//  columnClass: class extends CSVColumn {...}
+//  columnClassSelector: (name, ...) => {/* some CSVColumn descendants */}
+//  ...or...
+//  columnClass: class extends CSVColumn {...} // one custom for all
+
     columns: [
       'id',              // 1st column: read as `id`
       null,              // 2nd column: to ignore
