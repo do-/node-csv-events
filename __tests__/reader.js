@@ -42,7 +42,7 @@ test ('raw', async () =>  {
 	const reader = new CSVReader ({
 		empty: null,
 		rowNumField: '#',		
-		columnClass: CSVRawColumn,
+		columnClassSelector: name => name === 'id' ?  CSVRawColumn : CSVColumn,
 		columns: [
 			'id',
 			null, 
@@ -67,9 +67,9 @@ test ('raw', async () =>  {
 	})
 
 	expect (a).toStrictEqual ([
-		{id: '', label: '', '#': 1}, 
+		{id: '', label: null, '#': 1}, 
 		{id: '"1"', label: 'One', '#': 2}, 
-		{id: '2', label: '"Two"', '#': 3},
+		{id: '2', label: 'Two', '#': 3},
 	])
 
 })
