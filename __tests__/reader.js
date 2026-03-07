@@ -1,3 +1,5 @@
+const Path = require ('path')
+const fs = require ('fs')
 const {CSVReader, CSVColumn, CSVRawColumn} = require ('..')
 
 test ('basic', async () =>  {
@@ -436,5 +438,73 @@ test ('zero', async () =>  {
 	})
 
 	expect (a).toStrictEqual ([])
+
+})
+
+test ('basic file', async () =>  {
+
+	const reader = new CSVReader ({
+		empty: null,
+		rowNumField: '#',
+		columns: [
+			'id',
+			null, 
+			['label'],
+		]
+	})
+
+	expect (reader).toBeInstanceOf (CSVReader)
+
+	const a = []
+
+	await new Promise ((ok, fail) => {
+
+		reader.on ('error', fail)
+		reader.on ('end', ok)
+		reader.on ('data', r => a.push (r))
+
+		fs.createReadStream (Path.join (__dirname, '..', '__data__', '1.csv')).pipe (reader)
+
+	})
+
+	expect (a).toStrictEqual ([
+		{id: null, label: null, '#': 1}, 
+		{id: '1', label: 'One', '#': 2}, 
+		{id: '2', label: 'Two', '#': 3},
+	])
+
+})
+
+test ('utf8 BOM', async () =>  {
+
+	const reader = new CSVReader ({
+		empty: null,
+		rowNumField: '#',
+		columns: [
+			'id',
+			null, 
+			['label'],
+		]
+	})
+
+	expect (reader).toBeInstanceOf (CSVReader)
+
+	const a = []
+
+	await new Promise ((ok, fail) => {
+
+		reader.on ('error', fail)
+		reader.on ('end', ok)
+		reader.on ('data', r => a.push (r))
+
+		fs.createReadStream (Path.join (__dirname, '..', '__data__', 'utf8.csv')).pipe (reader)
+
+	})
+
+	expect (a).toStrictEqual ([
+		{id: null, label: null, '#': 1}, 
+		{id: '1', label: 'One', '#': 2}, 
+		{id: '2', label: 'Two', '#': 3},
+	])
 
 })
