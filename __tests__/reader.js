@@ -370,7 +370,7 @@ test ('destroy', async () =>  {
 
 })
 
-test.only ('c-error', async () =>  {
+test ('c-error', async () =>  {
 
 	const reader = new CSVReader ({
 		empty: null,
