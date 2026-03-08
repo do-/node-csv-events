@@ -27,6 +27,11 @@ const csv = CSVReader ({
 //  empty: null,         // how to interpret empty values (`''`)
 
 //  recordClass: Array   // to get [id, name] instead of {id, name}
+//  recordClass: class {
+//    valueOf () {       // skip records with _error set
+//      return this._error ? null : this
+//    }
+//  }
 
 //  columnClassSelector: (name, ...) => {/* some CSVColumn descendants */}
 //  ...or...
@@ -46,6 +51,12 @@ const csv = CSVReader ({
 //    maxColumns: 16384, // leak protection: 16384 is the Excel limit
 
 })
+
+const note = err => csv.record._error ??= err
+
+csv
+  .on ('c-error', note)
+  .on ('r-error', note)
 
 myReadUtf8CsvTextStream.pipe (csv)
 

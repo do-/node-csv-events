@@ -370,6 +370,50 @@ test ('destroy', async () =>  {
 
 })
 
+test.only ('c-error', async () =>  {
+
+	const reader = new CSVReader ({
+		empty: null,
+		rowNumField: '#',
+		mask: 5,
+		columnClass: class extends CSVColumn {
+			get value () {
+				const v = super.value
+				if (v == 1) throw (Error ('TEST'))
+				return v
+			}
+		},
+		header: 1,
+	})
+
+	expect (reader).toBeInstanceOf (CSVReader)
+
+	const a = [], e = []
+
+	reader.on ('c-error', err => e.push (err))
+
+	await new Promise ((ok, fail) => {
+
+		reader.on ('error', fail)
+		reader.on ('end', ok)
+		reader.on ('data', r => a.push (r))
+
+		reader.write (Buffer.from ('id,is_active,label\n', 'utf-8'))
+		reader.write (Buffer.from ('"1",true,One\n', 'utf-8'))
+		reader.end   (Buffer.from ('2,false,"Two"', 'utf-8'))
+
+	})
+	
+	expect (a).toStrictEqual ([
+		{'#': 1,          label: 'One'}, 
+		{'#': 2, id: '2', label: 'Two'},
+	])
+
+	expect (e [0].message).toBe ('TEST')
+
+})
+
+
 test ('valueOf', async () =>  {
 
 	const reader = new CSVReader ({
