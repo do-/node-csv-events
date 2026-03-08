@@ -66,23 +66,67 @@ for await (const {id, name} of csv) {
 ```
 
 # Description
+## General Structure
 
-The input stream must be a utf-8 encoded CSV text with either `CRLF` (`'\r\n'`) or `LF` (`'\n'`) line breaks.
+The input stream must be a CSV text.
 
-In general, this text may contain:
+The encoding is determined by the first bytes:
+* `FE FF` is recognized as the `utf-16le` [BOM](https://en.wikipedia.org/wiki/Byte_order_mark);
+* `EF BB BF` — as the `utf-8` BOM;
+* any text starting otherwise is considered BOMless `utf-8`.
+
+When the BOM is present, it must entirely fit in the first chunk fed to the reader.
+
+For line breaks, both `CRLF` (`'\r\n'`) and `LF` (`'\n'`) work. They can even coexist in one stream.
+
+In general, the text may contain:
 * first, `${skip} >= 0` totally ignored lines (the margin);
 * then, `${header} >= 0` lines describing the column model (e. g. one line with column names, but maybe more to specify types etc.);
 * finally, the body: a sequence of uniformly formatted lines.
 
 `CSVReader` skips the margin, reads the header and then yields one record object for each line of the body. The one exception is for a source consisting of a single line break (this is how MS Excel saves empty sheets) — in this case, no record is yielded at all.
 
-Records may represent lines as plain `Array`s of values or as key-value dictionary objects: it's configurable via the `recordClass` option. Custom classes are allowed.
+## Columns
+
+It's presumed that all body lines have the same structure: at least, the same number of cells. The data model is 
+* either provided as the `columns` option, 
+* or is read from the first `${header}` lines.
+
+In all cases, for each definition provided (except for `${mask}`ed out ones, when the `mask` option is set), a [CSVColumn](https://github.com/do-/node-csv-events/wiki/CSVColumn) or its descendant instance is created.
+
+Basically, each column is an object that:
+* knows its `name`;
+* reads the (unquoted) `value` of the current cell;
+* provides those `name` and `value` when the current record is filled in.
+
+Custom `columnClass`es may carry extra metainformation (e. g. column type, default value etc.) and use it to alter output records content by 
+overloading the `value` property getter:
+* performing validation / throwing errors (that's safe, see below);
+* adding extra formatting.
+
+Different columns may be represented by different classes: this is determined by a function set as the `columnClassSelector`.
+
+## Records
+
+By default, each incoming CSV line is transformed into a plain object with properties corresponding to `CSVReader's` columns.
+
+Alternatively, you can have records in form of `Array`s of values (again, one element per column) by setting `recordClass: Array`.
+
+More flexibility is available by using a custom `recordClass`. It can:
+* implement specific setters for individual fields (bound by name to corresponding columns);
+* override the [`valueOf()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/valueOf) method, which result is passed to [`push`](https://nodejs.org/docs/latest/api/stream.html#readablepushchunk-encoding) and so goes into the stream;
+  * except for [nullish](https://developer.mozilla.org/en-US/docs/Glossary/Nullish) values that are silently ignored.
 
 Each record may be augmented with an extra property containing the row number: this is configured via `rowNumField` and `rowNumBase` options.
 
-It's presumed that all body lines have the same structure: at least, the same number of cells. The data model is either provided as the `columns` option, or is read from the first `${header}` lines (only `${mask}`ed columns, when set). In all cases, for each definition provided, a [CSVColumn](https://github.com/do-/node-csv-events/wiki/CSVColumn) or its descendant instance is created.
+## Error handling
+With `CSVReader`, developers can safely throw errors from custom constructors, `value` getters, setters, `valueOf()` etc.
 
-Custom `columnClass`es may carry extra metainformation (e. g. column type, default value etc.) and use it to alter output records content by overloading the `value` property getter.
+All errors thrown from within `'c'` event handlers (that is, at the end of a cell) are emitted as `'c-error'` events.
+
+All errors thrown from within `'r'` event handlers (that is, at the end of a line) are emitted as `'r-error'` events.
+
+In both cases, unless a custom handler is installed, the `CSVReader` instance is [destroy](https://nodejs.org/docs/latest/api/stream.html#readabledestroyerror)ed with the incoming error.
 
 # Constructor Options
 ## Low Level 
@@ -93,6 +137,16 @@ These options are passed to the internal [CSVEventEmitter](https://github.com/do
 |`empty`|`null`|The `value` corresponding to zero length cell content|
 |`maxLength`|1e6|The maximum cell length allowed (to prevent a memory overflow)|
 
+## Column Definitions
+|Name|Default value|Description|
+|-|-|-|
+|`columnClass`|[CSVColumn](https://github.com/do-/node-csv-events/wiki/CSVColumn)|the class of column definition objects (if one for all)|
+|`columnClassSelector`|`(name,...) => this.columnClass`| column definition class selector |
+|`columns`||Explicit column definitions|
+|`mask`|`0`|Unless `0` with `header` set, only `mask`ed columns will be read|
+|`maxColumns`|`16384`|Maximum # of columns in the `header` (to prevent a memory overflow)|
+|`header`|`0`|Number of lines to gather `columns` definition|
+
 ## Row Selection and Numbering
 |Name|Default value|Description|
 |-|-|-|
@@ -101,14 +155,7 @@ These options are passed to the internal [CSVEventEmitter](https://github.com/do
 |`rowNumField`|`null`|The name of the line # property (`null` for no numbering)|
 |`skip`|`0`|Number of top lines to ignore (before `header`, if any)|
 
-## Column Definitions
-|Name|Default value|Description|
-|-|-|-|
-|`columnClass`|[CSVColumn](https://github.com/do-/node-csv-events/wiki/CSVColumn)||
-|`columns`||Explicit column definitions|
-|`mask`|`0`|Unless `0` with `header` set, only `mask`ed columns will be read|
-|`maxColumns`|`16384`|Maximum # of columns in the `header` (to prevent a memory overflow)|
-|`header`|`0`|Number of lines to gather `columns` definition|
+
 # `CSVEventEmitter` 
 
 This is an [events](https://nodejs.org/dist/latest/docs/api/events.html) based synchronous [CSV](https://datatracker.ietf.org/doc/html/rfc4180) parser.
