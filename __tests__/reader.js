@@ -377,7 +377,7 @@ test ('valueOf', async () =>  {
 		rowNumField: '#',
 		recordClass: class {
 			valueOf () {
-				return {[this['#']]: [parseInt (this.id) || null, this.label]}
+				return this.id ? {[this['#']]: [parseInt (this.id) || null, this.label]} : null
 			}
 		},
 		columns: [
@@ -404,7 +404,6 @@ test ('valueOf', async () =>  {
 	})
 
 	expect (a).toStrictEqual ([
-		{'1': [null, null]},
 		{'2': [1, 'One']},
 		{'3': [2, 'Two']},
 	])
